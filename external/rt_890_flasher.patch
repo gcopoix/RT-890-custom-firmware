@@ -1,0 +1,13 @@
+diff --git a/rt_890_flasher.py b/rt_890_flasher.py
+index 7f63e49..9e1f491 100755
+--- a/rt_890_flasher.py
++++ b/rt_890_flasher.py
+@@ -7,7 +7,7 @@ import serial  # type: ignore[import-untyped]
+ 
+ 
+ class RT890Flasher:
+-    ACK_RESPONSE = 0x06.to_bytes()
++    ACK_RESPONSE = bytearray([0x06])
+     FLASH_MODE_RESPONSE = 0xFF
+     CMD_ERASE_FLASH = 0x39
+     CMD_READ_FLASH = 0x52

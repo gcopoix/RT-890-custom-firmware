@@ -1,3 +1,6 @@
 [submodule "external/printf"]
 	path = external/printf
 	url = https://github.com/mpaland/printf
+[submodule "external/RT-890-python-flasher"]
+	path = external/RT-890-python-flasher
+	url = https://github.com/OEFW-community/RT-890-python-flasher.git

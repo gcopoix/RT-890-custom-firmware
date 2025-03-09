@@ -51,14 +51,14 @@ _Original OEFW readme_
 
 # Open reimplementation of the Radtel RT-890 v1.34 firmware
 
-This repository is a preservation project of the Radtel RT-890 v1.34 firmware.
+This repository is a preservation project of the **Radtel RT-890 v1.34 firmware**. \
 It is dedicated to understanding how the radio works and help developers making their own customisations/fixes/etc.
-It is by no means fully understood or has all variables/functions properly named, as this is best effort only.
+It is by no means fully understood or has all variables/functions properly named, as this is best effort only. \
 As a result, this repository will not include any customisations or improvements over the original firmware.
 
 # Compiler
 
-arm-none-eabi GCC version 10.3.1 is recommended, which is the current version on Ubuntu 22.04.03 LTS.
+arm-none-eabi GCC version 10.3.1 is recommended, which is the current version on Ubuntu 22.04.03 LTS. \
 Other versions may generate a flash file that is too big.
 You can get an appropriate version from: https://developer.arm.com/downloads/-/gnu-rm
 
@@ -72,7 +72,21 @@ make
 
 # Flashing
 
-* Use the firmware.bin file with either [RT-890-Flasher](https://github.com/OEFW-community/radtel-rt-890-flasher) or [RT-890-Flasher-CLI](https://github.com/OEFW-community/radtel-rt-890-flasher-cli)
+To flash the firmware:
+- connect your **RT-890** with a [data cable](https://www.radtels.com/de/collections/program-cables/products/radtel-usb-programming-cable-software-download-for-radtel-rt-490-rt-10-rt12-px-888k-rt-830-two-way-radio-walkie-talkie)
+- simultanously press and hold the **Side1** and **Side2** keys before turning on your radio. This enables the update mode. \
+The green LED will be on when this is done correctly.
+- from command line enter
+   ```
+   make flash
+   ```
+   The make script uses [RT-890-python-flasher](https://github.com/OEFW-community/RT-890-python-flasher) in a virtual python environment (with a minor [patch](external/rt_890_flasher.patch)).
+
+   By default [/dev/ttyUSB0](Makefile#L284-L290) is used. To select a different port you can overwrite it by
+   ```
+   make flash FLASH_PORT=<tty-port-of-your-choice>
+   ```
+- (on a Windows host) download [RT-890-Flasher](https://github.com/OEFW-community/radtel-rt-890-flasher) or [RT-890-Flasher-CLI](https://github.com/OEFW-community/radtel-rt-890-flasher-cli) and follow their documentation to flash the **RT-890**.
 
 # License
 

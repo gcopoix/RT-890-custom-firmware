@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Debug with JLink",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceFolder}",
+            "executable": "build/firmware.elf",
+            "device": "AT32F421C8T7",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none"
+        }
+    ]
+}

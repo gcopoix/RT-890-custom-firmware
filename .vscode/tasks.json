@@ -1,0 +1,43 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build firmware",
+            "type": "shell",
+            "command": "make",
+            "problemMatcher": "$gcc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "clean build dir",
+            "type": "shell",
+            "command": "make clean",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "flash firmware",
+            "type": "shell",
+            "command": "make flash FLASH_PORT=${input:tty}",
+            "problemMatcher": [ "$python" ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "tty",
+            "description": "tty port for flashing",
+            "default": "/dev/ttyUSB1",
+        }
+    ]
+}

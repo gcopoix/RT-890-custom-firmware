@@ -281,5 +281,14 @@ $(BUILD_DIR)/%.o: %.S Makefile
 
 -include $(DEPS)
 
+FLASH_PORT := /dev/ttyUSB0
+
+flash: $(BUILD_DIR)/$(TARGET).bin
+	if [ ! -f .venv/bin/activate ]; then python -m venv .venv; fi
+	. .venv/bin/activate
+	pip install pyserial
+	(cd external/RT-890-python-flasher; if git diff --quiet; then git apply ../rt_890_flasher.patch; fi)
+	python external/RT-890-python-flasher/rt_890_flasher.py $(FLASH_PORT) $<
+
 clean:
 	rm -rf $(BUILD_DIR)
