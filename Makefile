@@ -1,35 +1,34 @@
 TARGET = firmware
 
-UART_DEBUG			?= 0
-MOTO_STARTUP_TONE		?= 1
-ENABLE_AM_FIX			?= 1
-ENABLE_ALT_SQUELCH		?= 1
-ENABLE_STATUS_BAR_LINE		?= 0
-ENABLE_NOAA			?= 1
-ENABLE_RX_BAR			?= 1
-ENABLE_TX_BAR			?= 1
-ENABLE_SLOWER_RSSI_TIMER	?= 1
-ENABLE_SPECTRUM			?= 1
-ENABLE_KEEP_MONITOR_MODE_UP_DN	?= 0
-PCB_VER_2_1			?= 0
+UART_DEBUG                     ?= 0
+MOTO_STARTUP_TONE              ?= 1
+ENABLE_AM_FIX                  ?= 1
+ENABLE_ALT_SQUELCH             ?= 1
+ENABLE_STATUS_BAR_LINE         ?= 0
+ENABLE_NOAA                    ?= 1
+ENABLE_RX_BAR                  ?= 1
+ENABLE_TX_BAR                  ?= 1
+ENABLE_SLOWER_RSSI_TIMER       ?= 1
+ENABLE_SPECTRUM                ?= 1
+ENABLE_KEEP_MONITOR_MODE_UP_DN ?= 0
+PCB_VER_2_1                    ?= 0
 
 
 # Spectrum presets - 1.4 kB
-ENABLE_SPECTRUM_PRESETS		?= 1
+ENABLE_SPECTRUM_PRESETS        ?= 1
 # FM radio = 2.6 kB
-ENABLE_FM_RADIO			?= 1
+ENABLE_FM_RADIO                ?= 1
 # Register Editor = .5 kB
-ENABLE_REGISTER_EDIT		?= 0
+ENABLE_REGISTER_EDIT           ?= 0
 # Scanlist membership display - 252 B
-ENABLE_SCANLIST_DISPLAY		?= 1
+ENABLE_SCANLIST_DISPLAY        ?= 1
 # Space saving options
-ENABLE_LTO			?= 0
-ENABLE_OPTIMIZED		?= 1
+ENABLE_LTO                     ?= 0
+ENABLE_OPTIMIZED               ?= 1
 
 
-OBJS =
 # Startup files
-OBJS += startup/start.o
+OBJS  = startup/start.o
 OBJS += startup/init.o
 ifeq ($(UART_DEBUG),1)
 	OBJS += external/printf/printf.o
@@ -111,7 +110,7 @@ OBJS += task/idle.o
 OBJS += task/incoming.o
 OBJS += task/lock.o
 ifeq ($(ENABLE_NOAA), 1)
-OBJS += task/noaa.o
+	OBJS += task/noaa.o
 endif
 OBJS += task/ptt.o
 OBJS += task/rssi.o
@@ -132,7 +131,7 @@ OBJS += ui/logo.o
 OBJS += ui/main.o
 OBJS += ui/menu.o
 ifeq ($(ENABLE_NOAA), 1)
-OBJS += ui/noaa.o
+	OBJS += ui/noaa.o
 endif
 OBJS += ui/version.o
 OBJS += ui/vfo.o
@@ -142,10 +141,14 @@ OBJS += ui/welcome.o
 
 OBJS += main.o
 
+# place all objects to seperate build folder
+BUILD_DIR := build
+OBJS := $(addprefix $(BUILD_DIR)/,$(OBJS))
+
 ifeq ($(OS),Windows_NT)
-TOP := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+	TOP := "$(dir $(realpath $(lastword $(MAKEFILE_LIST))))"
 else
-TOP := $(shell pwd)
+	TOP := "$(shell pwd)"
 endif
 
 SDK := $(TOP)/external/SDK
@@ -160,38 +163,37 @@ SIZE = arm-none-eabi-size
 GIT_HASH_TMP := $(shell git rev-parse --short HEAD)
 
 ifeq ($(GIT_HASH_TMP),)
-GIT_HASH := "NOGIT"
+	GIT_HASH := "NOGIT"
 else
-GIT_HASH := $(GIT_HASH_TMP)
+	GIT_HASH := $(GIT_HASH_TMP)
 endif
 
 ASFLAGS = -mcpu=cortex-m4
-CFLAGS = -Os -Wall -Werror -mcpu=cortex-m4 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c2x -MMD
+CFLAGS  = -Os -Wall -Werror -mcpu=cortex-m4 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c2x -MMD
 CFLAGS += -DAT32F421C8T7
 CFLAGS += -DPRINTF_INCLUDE_CONFIG_H
 CFLAGS += -DGIT_HASH=\"$(GIT_HASH)\"
 LDFLAGS = -mcpu=cortex-m4 -nostartfiles -Wl,-T,firmware.ld
 
 ifeq ($(ENABLE_OPTIMIZED),1)
-CFLAGS += --specs=nano.specs
-LDFLAGS += --specs=nano.specs
+	CFLAGS += --specs=nano.specs
+	LDFLAGS += --specs=nano.specs
 
-CFLAGS += -ffunction-sections
-LDFLAGS += -Wl,--gc-sections
+	CFLAGS += -ffunction-sections
+	LDFLAGS += -Wl,--gc-sections
 
-CFLAGS += -finline-limit=0
+	CFLAGS += -finline-limit=0
 
-CFLAGS += -fmerge-all-constants
+	CFLAGS += -fmerge-all-constants
 endif
  
 ifeq ($(DEBUG),1)
-ASFLAGS += -g
-CFLAGS += -g
-LDFLAGS += -g
+	ASFLAGS += -g
+	CFLAGS += -g
+	LDFLAGS += -g
 endif
 
-INC =
-INC += -I $(TOP)
+INC  = -I $(TOP)
 INC += -I $(SDK)/libraries/cmsis/cm4/device_support
 INC += -I $(SDK)/libraries/cmsis/cm4/core_support/
 INC += -I $(SDK)/libraries/drivers/inc/
@@ -253,22 +255,26 @@ ifeq ($(ENABLE_STATUS_BAR_LINE), 1)
 endif
 
 
-all: $(TARGET)
-	$(OBJCOPY) -O binary $< $<.bin
-	$(SIZE) $<
+all: $(BUILD_DIR)/$(TARGET).bin
 
 ctags:
 	ctags -R -f .tags .
 
-ui/version.o: .FORCE
+$(BUILD_DIR)/ui/version.o: .FORCE
 
-$(TARGET): $(OBJS)
+$(BUILD_DIR)/$(TARGET).bin: $(BUILD_DIR)/$(TARGET).elf
+	$(OBJCOPY) -O binary $< $@
+	$(SIZE) $<
+
+$(BUILD_DIR)/$(TARGET).elf: $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
 
-%.o: %.c
+$(BUILD_DIR)/%.o: %.c Makefile
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
-%.o: %.S
+$(BUILD_DIR)/%.o: %.S Makefile
+	mkdir -p $(dir $@)
 	$(AS) $(ASFLAGS) $< -o $@
 
 .FORCE:
@@ -276,4 +282,4 @@ $(TARGET): $(OBJS)
 -include $(DEPS)
 
 clean:
-	rm -f $(TARGET).bin $(TARGET) $(OBJS) $(DEPS)
+	rm -rf $(BUILD_DIR)

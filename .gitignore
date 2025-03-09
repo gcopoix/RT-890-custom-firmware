@@ -1,10 +1,1 @@
-*.o
-*.d
-firmware
-firmware.bin
-.tags
-
-external/SDK
-.vscode/
-.cache
-compile_commands.json
+build
